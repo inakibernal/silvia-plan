@@ -486,12 +486,13 @@ header {
 .ex-name-s { font-size: 14px; font-weight: 600; }
 .ex-reps { font-size: 10px; color: var(--muted); margin-top: 3px; }
 .controls {
-  border-top: 1px solid rgba(255,255,255,0.08);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
   padding: 16px;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
   background: rgba(255,255,255,0.04);
+  flex-shrink: 0;
 }
 .controls .btn {
   width: 100%;
@@ -547,14 +548,100 @@ header {
   .rounds-section { padding-inline: 16px; }
   .exercise-name { font-size: 34px; }
   .ex-item { padding-inline: 16px; }
-  .controls {
-    position: sticky;
-    bottom: 0;
-    z-index: 5;
-    padding-bottom: calc(12px + env(safe-area-inset-bottom));
-  }
+  /* controls now sit above the list — no sticky needed */
   .sel-day-btns { grid-template-columns: 1fr; }
 }
+
+/* ── Esta semana card ─────────────────────────────────────────── */
+.sel-day-btn.today {
+  border-color: rgba(88,166,255,0.5);
+  background: linear-gradient(135deg,rgba(88,166,255,0.12),rgba(255,255,255,0.04));
+  box-shadow: 0 0 24px rgba(88,166,255,0.15);
+}
+.sel-day-btn.done {
+  border-color: rgba(142,246,211,0.35);
+  background: rgba(142,246,211,0.05);
+}
+.tw-week-num {
+  font-size: 11px;
+  letter-spacing: 1px;
+  color: var(--accent2);
+  margin-top: 4px;
+  font-family: ui-monospace,'Cascadia Code','Fira Code',monospace;
+}
+.tw-badge {
+  display: inline-block;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  vertical-align: middle;
+  margin-left: 4px;
+  font-family: ui-monospace,'Cascadia Code','Fira Code',monospace;
+}
+.tw-badge-today { background: linear-gradient(135deg,#58a6ff,#79b8ff); color:#0d1117; }
+.tw-badge-next  { border:1px solid rgba(88,166,255,0.4); color:var(--accent); background:rgba(88,166,255,0.10); }
+.tw-badge-done  { border:1px solid rgba(142,246,211,0.4); color:var(--accent3); background:rgba(142,246,211,0.08); }
+
+/* ── Barra de progreso ────────────────────────────────────────── */
+.sel-progress-wrap {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  backdrop-filter: blur(14px);
+  box-shadow: var(--shadow);
+}
+.sel-progress-text {
+  font-family: ui-monospace,'Cascadia Code','Fira Code',monospace;
+  font-size: 11px;
+  letter-spacing: 1px;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.sel-progress-track {
+  height: 6px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.sel-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg,var(--accent),var(--accent3));
+  border-radius: 999px;
+  transition: width .4s ease;
+  min-width: 3px;
+}
+
+/* ── Acordeón ─────────────────────────────────────────────────── */
+.sel-accordion { width: 100%; max-width: 620px; }
+.sel-accordion-btn {
+  width: 100%;
+  padding: 14px 18px;
+  border-radius: var(--radius);
+  background: var(--card);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-family: ui-monospace,'Cascadia Code','Fira Code',monospace;
+  font-size: 12px;
+  letter-spacing: 1px;
+  text-align: left;
+  cursor: pointer;
+  backdrop-filter: blur(14px);
+  transition: border-color .18s, color .18s, background .18s;
+}
+.sel-accordion-btn:hover { border-color: rgba(88,166,255,0.5); color: var(--text); }
+.sel-accordion-btn.open  { border-color: rgba(88,166,255,0.35); color: var(--text); }
+.sel-accordion-body {
+  display: none;
+  flex-direction: column;
+  gap: 18px;
+  align-items: stretch;
+  margin-top: 12px;
+}
+.sel-accordion-body.open { display: flex; }
 
 @media (max-width: 480px) {
   .sel-logo { letter-spacing: 5px; }
@@ -572,10 +659,23 @@ header {
   <a href="/" class="home-back-btn">← Inicio</a>
   <div class="sel-logo">SILVIA</div>
   <div class="sel-tagline">Plan 22 semanas · 3 días / semana</div>
-  <div id="sel-phases"></div>
-  <div id="sel-day-picker" class="sel-day-picker">
-    <div class="sel-day-label">Elige el día</div>
-    <div class="sel-day-btns" id="sel-day-btns"></div>
+
+  <!-- Card "Esta semana" / Plan completado -->
+  <div id="this-week-card" style="width:100%;max-width:620px"></div>
+
+  <!-- Barra de progreso global -->
+  <div id="progress-bar-section" style="width:100%;max-width:620px"></div>
+
+  <!-- Acordeón "Ver todas las semanas" -->
+  <div class="sel-accordion" id="sel-accordion">
+    <button class="sel-accordion-btn" id="accordion-btn" onclick="toggleAccordion()">Ver todas las semanas →</button>
+    <div class="sel-accordion-body" id="sel-accordion-body">
+      <div id="sel-phases"></div>
+      <div id="sel-day-picker" class="sel-day-picker">
+        <div class="sel-day-label">Elige el día</div>
+        <div class="sel-day-btns" id="sel-day-btns"></div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -631,12 +731,12 @@ header {
         <div class="rounds-label" id="rounds-label">Ronda 1 de 4</div>
         <div class="rounds-dots" id="rounds-dots"></div>
       </div>
-      <div class="exercise-list" id="ex-list"></div>
       <div class="controls">
         <button class="btn" onclick="prevEx()">← PREV</button>
         <button class="btn btn-primary" id="play-btn" onclick="togglePause()">PAUSA</button>
         <button class="btn" onclick="nextEx()">NEXT →</button>
       </div>
+      <div class="exercise-list" id="ex-list"></div>
     </div>
   </div>
 </div>
@@ -832,6 +932,8 @@ const DAYS = [
 let activeWeekBtn = null;
 let currentWO = null;
 let currentBadge = '';
+let currentWeekKey = '';
+let currentDayKey = '';
 
 // Bloque 1: desde 2026-04-13 (sem 1–10). Bloque 2 empieza aprox. 2026-06-16 (sem 11–22).
 const PLAN_START = new Date('2026-04-13T00:00:00');
@@ -846,11 +948,82 @@ function getTodayWorkout() {
   return { weekKey: 'w' + weekNum, weekNum, dayKey };
 }
 
+function getProgress() {
+  try { return JSON.parse(localStorage.getItem('silvia-progress') || '[]'); } catch(e) { return []; }
+}
+
+function renderThisWeekCard() {
+  const cardEl = document.getElementById('this-week-card');
+  if (!cardEl) return;
+  const today = new Date(); today.setHours(0,0,0,0);
+  const start = new Date(PLAN_START); start.setHours(0,0,0,0);
+  const diffDays = Math.floor((today - start) / 86400000);
+
+  if (diffDays >= 154) {
+    cardEl.innerHTML = '<div class="sel-phase" style="text-align:center;padding:28px 18px"><div style="font-size:36px;margin-bottom:10px">🎉</div><div style="font-size:20px;font-weight:700;color:var(--accent);letter-spacing:2px">PLAN COMPLETADO</div><div class="sel-tagline" style="margin-top:8px">22 semanas · ¡Lo has conseguido!</div></div>';
+    return;
+  }
+  if (diffDays < 0) { cardEl.innerHTML = ''; return; }
+
+  const weekNum = Math.floor(diffDays / 7) + 1;
+  const wk = 'w' + weekNum;
+  const wo = WORKOUTS[wk];
+  if (!wo) { cardEl.innerHTML = ''; return; }
+
+  const todayDow = today.getDay();
+  const dowToKey = {1:'lunes', 3:'miercoles', 5:'viernes'};
+  const todayDayKey = dowToKey[todayDow] || null;
+  let nextDayKey = null;
+  if (!todayDayKey) {
+    for (const dow of [1,3,5]) {
+      if (dow > todayDow) { nextDayKey = dowToKey[dow]; break; }
+    }
+  }
+
+  const progress = getProgress();
+  const daysHtml = DAYS.map(d => {
+    const isToday = d.key === todayDayKey;
+    const isNext  = !todayDayKey && d.key === nextDayKey;
+    const isDone  = progress.includes(wk + '-' + d.key);
+    let badge = '';
+    if (isToday) badge = '<span class="tw-badge tw-badge-today">HOY</span>';
+    else if (isNext) badge = '<span class="tw-badge tw-badge-next">PRÓXIMO</span>';
+    else if (isDone) badge = '<span class="tw-badge tw-badge-done">✓</span>';
+    const dayWo = WORKOUTS[wk][d.key];
+    return `<button class="sel-day-btn${isToday?' today':''}${isDone?' done':''}" onclick="selectDay('${wk}','${d.key}')">${d.label}${badge}<div class="sel-day-title">${dayWo.title} · ${dayWo.minutes} min</div></button>`;
+  }).join('');
+
+  cardEl.innerHTML = `<div class="sel-phase"><div class="sel-phase-label">ESTA SEMANA</div><div class="tw-week-num">Semana ${weekNum} de 22 · ${wo.badge}</div><div class="sel-day-btns" style="margin-top:14px">${daysHtml}</div></div>`;
+}
+
+function renderProgressBar() {
+  const el = document.getElementById('progress-bar-section');
+  if (!el) return;
+  const today = new Date(); today.setHours(0,0,0,0);
+  const start = new Date(PLAN_START); start.setHours(0,0,0,0);
+  const diffDays = Math.floor((today - start) / 86400000);
+  if (diffDays < 0 || diffDays >= 154) { el.innerHTML = ''; return; }
+  const weekNum = Math.min(Math.floor(diffDays / 7) + 1, 22);
+  const completed = getProgress().length;
+  const pct = Math.min(100, Math.round(completed / 66 * 100));
+  el.innerHTML = `<div class="sel-progress-wrap"><div class="sel-progress-text">Semana ${weekNum} de 22 · ${completed} sesiones completadas</div><div class="sel-progress-track"><div class="sel-progress-fill" style="width:${pct}%"></div></div></div>`;
+}
+
+function toggleAccordion() {
+  const body = document.getElementById('sel-accordion-body');
+  const btn  = document.getElementById('accordion-btn');
+  const isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  btn.classList.toggle('open', !isOpen);
+  btn.textContent = isOpen ? 'Ver todas las semanas →' : 'Ver todas las semanas ↑';
+}
+
 function renderSelector() {
-  const td = getTodayWorkout();
+  renderThisWeekCard();
+  renderProgressBar();
+
   const container = document.getElementById('sel-phases');
   container.innerHTML = '';
-  let todayBtn = null;
   PHASES.forEach(ph => {
     const sec = document.createElement('div');
     sec.className = 'sel-phase';
@@ -860,17 +1033,14 @@ function renderSelector() {
     ph.weeks.forEach(wk => {
       const btn = document.createElement('button');
       btn.className = 'sel-week-btn';
-      const isToday = td && td.weekKey === wk;
-      btn.innerHTML = WORKOUTS[wk].label + (isToday ? '<br><span style="font-size:9px;letter-spacing:2px;color:var(--accent)">HOY</span>' : '');
+      btn.innerHTML = WORKOUTS[wk].label;
       btn.onclick = () => selectWeek(wk, btn);
-      if (isToday) todayBtn = { wk, btn };
       grid.appendChild(btn);
     });
     sec.appendChild(grid);
     container.appendChild(sec);
   });
   document.getElementById('sel-day-picker').classList.remove('visible');
-  if (todayBtn) selectWeek(todayBtn.wk, todayBtn.btn);
 }
 
 function selectWeek(wk, btn) {
@@ -897,6 +1067,8 @@ function selectWeek(wk, btn) {
 }
 
 function selectDay(wk, dayKey) {
+  currentWeekKey = wk;
+  currentDayKey = dayKey;
   currentWO = WORKOUTS[wk][dayKey];
   currentBadge = WORKOUTS[wk].badge;
   showStartScreen();
@@ -1272,6 +1444,13 @@ function togglePause() {
   else { if (ytPlayer && currentVideoId) ytPlayer.playVideo(); }
 }
 function finishWorkout() {
+  if (currentWeekKey && currentDayKey) {
+    try {
+      const prog = JSON.parse(localStorage.getItem('silvia-progress') || '[]');
+      const sk = currentWeekKey + '-' + currentDayKey;
+      if (!prog.includes(sk)) { prog.push(sk); localStorage.setItem('silvia-progress', JSON.stringify(prog)); }
+    } catch(e) {}
+  }
   clearAllTimers();
   if (ytPlayer) ytPlayer.stopVideo();
   document.getElementById('player').style.display = 'none';
@@ -1287,6 +1466,8 @@ function goToSelector() {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('visible'));
   document.getElementById('player').style.display = 'none';
   document.getElementById('selector-screen').classList.add('visible');
+  renderThisWeekCard();
+  renderProgressBar();
 }
 
 renderSelector();
