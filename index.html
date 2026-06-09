@@ -1,0 +1,1298 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plan Silvia · 22 semanas</title>
+<style>
+:root {
+  --bg: #0d1117;
+  --bg2: #161b22;
+  --surface: rgba(255,255,255,0.08);
+  --surface-strong: rgba(255,255,255,0.14);
+  --card: rgba(255,255,255,0.10);
+  --border: rgba(255,255,255,0.12);
+  --accent: #58a6ff;
+  --accent2: #d29922;
+  --accent3: #8ef6d3;
+  --text: #f0f6fc;
+  --muted: #9ba8b5;
+  --shadow: 0 18px 50px rgba(0,0,0,0.28);
+  --radius: 24px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { min-height: 100%; }
+body {
+  background:
+    radial-gradient(circle at top left, rgba(88,166,255,0.12), transparent 28%),
+    radial-gradient(circle at top right, rgba(210,153,34,0.10), transparent 22%),
+    linear-gradient(180deg, var(--bg) 0%, var(--bg2) 100%);
+  color: var(--text);
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  min-height: 100vh;
+}
+
+a { color: inherit; }
+.home-back-btn {
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 12px;
+  padding: 7px 14px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  font-family: ui-monospace, 'Cascadia Code', 'Fira Code', monospace;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  transition: all .18s;
+  z-index: 10;
+}
+.home-back-btn:hover {
+  color: var(--text);
+  border-color: rgba(88,166,255,0.5);
+  background: rgba(88,166,255,0.10);
+}
+
+.screen {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(circle at top left, rgba(88,166,255,0.12), transparent 28%),
+    linear-gradient(180deg, var(--bg) 0%, var(--bg2) 100%);
+  z-index: 100;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  text-align: center;
+  overflow-y: auto;
+  padding: calc(32px + env(safe-area-inset-top)) 20px calc(40px + env(safe-area-inset-bottom));
+  gap: 18px;
+}
+.screen.visible { display: flex; }
+
+.sel-logo {
+  font-size: clamp(36px, 7vw, 54px);
+  font-weight: 900;
+  letter-spacing: 6px;
+  color: var(--text);
+  margin-top: 12px;
+  text-transform: uppercase;
+  text-shadow: 0 6px 24px rgba(88,166,255,0.18);
+}
+.sel-tagline,
+.screen-sub,
+.rest-title,
+.sel-phase-label,
+.sel-day-label,
+.rounds-label,
+.block-name,
+.phase-badge,
+.ex-reps,
+.rep-label {
+  font-family: ui-monospace, 'Cascadia Code', 'Fira Code', monospace;
+}
+.sel-tagline {
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.sel-phase,
+.sel-day-picker,
+.start-list {
+  width: 100%;
+  max-width: 620px;
+}
+.sel-phase {
+  text-align: left;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 18px;
+  backdrop-filter: blur(14px);
+}
+.sel-phase-label,
+.sel-day-label {
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.sel-week-grid,
+.sel-day-btns {
+  display: grid;
+  gap: 10px;
+}
+.sel-week-grid { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); }
+.sel-day-btns { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.sel-week-btn,
+.sel-day-btn,
+.btn {
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.05);
+  color: var(--text);
+  font-family: ui-monospace, 'Cascadia Code', 'Fira Code', monospace;
+  cursor: pointer;
+  transition: transform .18s ease, border-color .18s ease, background .18s ease, color .18s ease, box-shadow .18s ease;
+}
+.sel-week-btn {
+  padding: 13px 14px;
+  border-radius: 16px;
+  font-size: 12px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.sel-day-picker {
+  display: none;
+  text-align: left;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 18px;
+  backdrop-filter: blur(14px);
+}
+.sel-day-picker.visible { display: block; }
+.sel-day-btn {
+  padding: 18px 12px;
+  border-radius: 18px;
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-align: center;
+}
+.sel-day-title {
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: 7px;
+  letter-spacing: .3px;
+  text-transform: none;
+}
+.sel-week-btn:hover, .sel-week-btn.active,
+.sel-day-btn:hover,
+.btn:hover {
+  border-color: rgba(88,166,255,0.7);
+  background: rgba(88,166,255,0.10);
+  box-shadow: 0 10px 25px rgba(88,166,255,0.15);
+  transform: translateY(-1px);
+}
+
+.screen-title {
+  font-size: clamp(40px, 8vw, 60px);
+  font-weight: 900;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--text);
+  margin-top: 8px;
+}
+.screen-sub {
+  font-size: 12px;
+  color: var(--muted);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+.start-list {
+  list-style: none;
+  text-align: left;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(14px);
+  padding: 10px 18px;
+}
+.start-list li {
+  padding: 10px 0;
+  font-size: 13px;
+  font-family: ui-monospace, 'Cascadia Code', 'Fira Code', monospace;
+  color: var(--muted);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.start-list li:last-child { border-bottom: none; }
+.start-list li.hdr {
+  color: var(--accent2);
+  font-size: 10px;
+  letter-spacing: 2px;
+  border-bottom: none;
+  padding-top: 16px;
+  text-transform: uppercase;
+}
+
+.btn {
+  padding: 14px 24px;
+  border-radius: 18px;
+  font-size: 12px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent), #79b8ff);
+  color: #0d1117;
+  border-color: transparent;
+  font-weight: 600;
+  box-shadow: 0 10px 24px rgba(88,166,255,0.22);
+}
+.btn-primary:hover {
+  background: linear-gradient(135deg, #79b8ff, #a0c8ff);
+  color: #0d1117;
+}
+
+.rest-title {
+  font-size: 11px;
+  letter-spacing: 4px;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-top: 24px;
+}
+.screen-timer {
+  font-size: clamp(80px, 16vw, 120px);
+  font-weight: 900;
+  line-height: 1;
+  color: var(--accent2);
+}
+
+#player {
+  display: none;
+  flex-direction: column;
+  min-height: 100vh;
+  padding: 14px;
+  gap: 14px;
+}
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 18px;
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  background: var(--card);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(14px);
+  flex-shrink: 0;
+}
+.logo {
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: 3px;
+  color: var(--text);
+}
+.phase-badge {
+  font-size: 11px;
+  letter-spacing: 3px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(88,166,255,0.40);
+  color: var(--accent2);
+  background: rgba(88,166,255,0.08);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.main {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(320px, .9fr);
+  gap: 14px;
+  flex: 1;
+  min-height: 0;
+}
+.video-area,
+.sidebar {
+  border: 1px solid var(--border);
+  border-radius: 28px;
+  background: var(--card);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(14px);
+  overflow: hidden;
+}
+.video-area {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  min-height: clamp(280px, 58vh, 720px);
+  background:
+    radial-gradient(circle at top left, rgba(88,166,255,0.10), transparent 25%),
+    rgba(0,0,0,0.28);
+}
+#yt-player {
+  width: 100%;
+  height: 100%;
+  min-height: clamp(280px, 58vh, 720px);
+  aspect-ratio: 16 / 9;
+}
+.timer-overlay {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: rgba(13,17,23,0.88);
+  border: 1px solid rgba(210,153,34,0.45);
+  border-radius: 18px;
+  padding: 10px 18px;
+  font-size: 48px;
+  font-weight: 900;
+  color: var(--accent2);
+  line-height: 1;
+  letter-spacing: 2px;
+  min-width: 116px;
+  text-align: center;
+  display: none;
+  backdrop-filter: blur(10px);
+}
+.timer-overlay.warning {
+  color: #ffdede;
+  border-color: rgba(88,166,255,0.55);
+  background: rgba(20,8,8,0.90);
+}
+.rep-overlay {
+  position: absolute;
+  left: 16px;
+  bottom: 16px;
+  background: rgba(13,17,23,0.90);
+  padding: 12px 16px;
+  border-radius: 18px;
+  border: 1px solid rgba(255,255,255,0.10);
+  backdrop-filter: blur(10px);
+}
+.rep-count {
+  font-size: 52px;
+  font-weight: 900;
+  line-height: 1;
+  color: var(--text);
+}
+.rep-label {
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+.video-help {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: rgba(13,17,23,0.88);
+  border: 1px solid rgba(255,255,255,0.10);
+  font-family: ui-monospace, 'Cascadia Code', 'Fira Code', monospace;
+  font-size: 11px;
+  color: var(--muted);
+  text-decoration: none;
+  backdrop-filter: blur(10px);
+}
+.video-help strong { color: var(--text); font-weight: 500; }
+.video-help:hover {
+  color: var(--text);
+  border-color: rgba(88,166,255,0.5);
+  background: rgba(88,166,255,0.10);
+}
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.exercise-header {
+  padding: 22px 22px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.block-name {
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.exercise-name {
+  font-size: clamp(28px, 3.5vw, 40px);
+  font-weight: 900;
+  letter-spacing: 0.5px;
+  line-height: 1.05;
+}
+.exercise-detail {
+  font-size: 13px;
+  color: var(--accent2);
+  margin-top: 8px;
+  font-family: ui-monospace, 'Cascadia Code', 'Fira Code', monospace;
+  line-height: 1.45;
+}
+.easy-option {
+  display: none;
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--muted);
+  font-family: ui-monospace, 'Cascadia Code', 'Fira Code', monospace;
+  line-height: 1.45;
+}
+.easy-option.visible { display: block; }
+.rounds-section {
+  padding: 16px 22px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.rounds-label {
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.rounds-dots { display: flex; gap: 8px; flex-wrap: wrap; }
+.dot {
+  width: 11px;
+  height: 11px;
+  border: 1px solid rgba(255,255,255,0.24);
+  border-radius: 50%;
+  transition: all 0.25s;
+}
+.dot.done { background: var(--accent3); border-color: var(--accent3); }
+.dot.current { background: var(--accent); border-color: var(--accent); animation: pulse 1s infinite; }
+@keyframes pulse { 0%,100%{opacity:1; transform:scale(1)} 50%{opacity:.55; transform:scale(.92)} }
+.exercise-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px 0;
+}
+.ex-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 22px;
+  cursor: pointer;
+  border-left: 4px solid transparent;
+  transition: background .18s ease, border-color .18s ease;
+}
+.ex-item:hover { background: rgba(255,255,255,0.06); }
+.ex-item.active {
+  border-left-color: var(--accent);
+  background: rgba(88,166,255,0.08);
+}
+.ex-num {
+  font-family: ui-monospace, 'Cascadia Code', 'Fira Code', monospace;
+  font-size: 10px;
+  color: var(--muted);
+  width: 20px;
+  text-align: right;
+  flex-shrink: 0;
+}
+.ex-info { flex: 1; }
+.ex-name-s { font-size: 14px; font-weight: 600; }
+.ex-reps { font-size: 10px; color: var(--muted); margin-top: 3px; }
+.controls {
+  border-top: 1px solid rgba(255,255,255,0.08);
+  padding: 16px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  background: rgba(255,255,255,0.04);
+}
+.controls .btn {
+  width: 100%;
+  padding: 14px 10px;
+  font-size: 11px;
+}
+
+@media (max-width: 1080px) {
+  .main { grid-template-columns: 1fr; }
+  .video-area { min-height: clamp(260px, 48vh, 520px); }
+  #yt-player { min-height: clamp(260px, 48vh, 520px); }
+}
+
+@media (max-width: 768px) {
+  #player { padding: 10px; gap: 10px; }
+  .screen { padding-inline: 14px; }
+  header {
+    flex-wrap: wrap;
+    justify-content: center;
+    text-align: center;
+    padding: 14px;
+  }
+  .phase-badge { width: 100%; text-align: center; }
+  .video-area,
+  .sidebar,
+  .sel-phase,
+  .sel-day-picker,
+  .start-list { border-radius: 22px; }
+  .video-area { min-height: 240px; }
+  #yt-player { min-height: 240px; }
+  .timer-overlay {
+    top: 12px;
+    right: 12px;
+    font-size: 40px;
+    min-width: 100px;
+    padding: 9px 14px;
+  }
+  .rep-overlay {
+    left: 12px;
+    bottom: 12px;
+    padding: 10px 14px;
+  }
+  .rep-count { font-size: 42px; }
+  .video-help {
+    right: 12px;
+    bottom: 12px;
+    max-width: calc(100% - 144px);
+    text-align: right;
+    font-size: 10px;
+    padding: 9px 12px;
+  }
+  .exercise-header,
+  .rounds-section { padding-inline: 16px; }
+  .exercise-name { font-size: 34px; }
+  .ex-item { padding-inline: 16px; }
+  .controls {
+    position: sticky;
+    bottom: 0;
+    z-index: 5;
+    padding-bottom: calc(12px + env(safe-area-inset-bottom));
+  }
+  .sel-day-btns { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 480px) {
+  .sel-logo { letter-spacing: 5px; }
+  .screen-title { font-size: 44px; }
+  .btn, .sel-day-btn, .sel-week-btn { font-size: 11px; }
+  .exercise-name { font-size: 30px; }
+  .controls .btn { padding: 13px 8px; }
+  .video-help { position: static; margin: 12px; max-width: none; justify-content: center; }
+}
+</style>
+</head>
+<body>
+
+<div id="selector-screen" class="screen visible">
+  <a href="/" class="home-back-btn">← Inicio</a>
+  <div class="sel-logo">SILVIA</div>
+  <div class="sel-tagline">Plan 22 semanas · 3 días / semana</div>
+  <div id="sel-phases"></div>
+  <div id="sel-day-picker" class="sel-day-picker">
+    <div class="sel-day-label">Elige el día</div>
+    <div class="sel-day-btns" id="sel-day-btns"></div>
+  </div>
+</div>
+
+<div id="start-screen" class="screen">
+  <div class="screen-title" id="start-day-label">LUNES</div>
+  <div class="screen-sub" id="start-subtitle"></div>
+  <ul id="start-list" class="start-list"></ul>
+  <button class="btn btn-primary" onclick="beginWorkout()" style="margin-top:8px">EMPEZAR →</button>
+  <button class="btn" onclick="goToSelector()">← VOLVER</button>
+</div>
+
+<div id="rest-screen" class="screen">
+  <div class="rest-title" id="rest-label">DESCANSO</div>
+  <div class="screen-timer" id="rest-countdown">2:00</div>
+  <div class="screen-sub" id="rest-next-msg"></div>
+  <button class="btn btn-primary" onclick="skipRest()">SALTAR →</button>
+</div>
+
+<div id="finish-screen" class="screen">
+  <div class="screen-title" style="color:var(--accent)">HECHO</div>
+  <div class="screen-sub" id="finish-stats" style="margin-top:8px"></div>
+  <button class="btn btn-primary" onclick="goToSelector()" style="margin-top:16px">VOLVER AL INICIO</button>
+</div>
+
+<div id="player">
+  <header>
+    <div style="display:flex;align-items:center;gap:14px">
+      <a href="/" style="color:var(--muted);text-decoration:none;font-size:22px;line-height:1;padding:2px;transition:color .15s" title="Casa Bernal" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted)'">⌂</a>
+      <div class="logo">SILVIA</div>
+    </div>
+    <div class="phase-badge" id="phase-badge">FASE 1</div>
+  </header>
+  <div class="main">
+    <div class="video-area">
+      <div id="yt-player"></div>
+      <div class="timer-overlay" id="timer-display">0:00</div>
+      <div class="rep-overlay">
+        <div class="rep-count" id="rep-count">10</div>
+        <div class="rep-label" id="rep-label">REPS</div>
+      </div>
+      <a id="video-help" class="video-help" href="#" target="_blank" rel="noopener noreferrer">
+        <strong>Abrir en YouTube</strong>
+      </a>
+    </div>
+    <div class="sidebar">
+      <div class="exercise-header">
+        <div class="block-name" id="block-name">BLOQUE A</div>
+        <div class="exercise-name" id="ex-name">—</div>
+        <div class="exercise-detail" id="ex-detail"></div>
+        <div class="easy-option" id="easy-option"></div>
+      </div>
+      <div class="rounds-section" id="rounds-section">
+        <div class="rounds-label" id="rounds-label">Ronda 1 de 4</div>
+        <div class="rounds-dots" id="rounds-dots"></div>
+      </div>
+      <div class="exercise-list" id="ex-list"></div>
+      <div class="controls">
+        <button class="btn" onclick="prevEx()">← PREV</button>
+        <button class="btn btn-primary" id="play-btn" onclick="togglePause()">PAUSA</button>
+        <button class="btn" onclick="nextEx()">NEXT →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const E = {
+  sentadilla: (r,d,e)=> ({name:'Sentadilla a silla', reps:r, unit:'reps', ytId:'xqvCmoLULNY', detail:d||'Tocar silla suave y subir', easyOption:e||'Menos recorrido o usar una silla un poco más alta'}),
+  glute:      (r,d,e)=> ({name:'Glute bridge', reps:r, unit:'reps', ytId:'Xp33YgPZgns', detail:d||'Apretar glúteo arriba 1 segundo', easyOption:e||'Hacer menos repeticiones o descansar 1 segundo abajo'}),
+  deadbug:    (r,d,e)=> ({name:'Dead bug', reps:r, unit:'lado', ytId:'g_BYB0R-4Ws', detail:d||'Lumbar pegada al suelo', easyOption:e||'Mover solo brazos o solo piernas'}),
+  stepups:    (r,u,d,e)=> ({name:'Step-ups', reps:r, unit:u||'pierna', ytId:'5qjqDHOUh-A', detail:d||'Subida controlada, sin impulso', easyOption:e||'Usar una superficie más baja o apoyar la mano'}),
+  marcha:     (r,d,e)=> ({name:'Marcha rápida', reps:r, unit:'seg', ytId:'njeZ29umqVE', detail:d||'Ritmo vivo, sin impacto', isTimed:true, easyOption:e||'Bajar el ritmo, pero seguir en movimiento'}),
+  plancha:    (r,d,e)=> ({name:'Plancha frontal', reps:r, unit:'seg', ytId:'zRElVWcYx_M', detail:d||'Cuerpo recto, abdomen activo', isTimed:true, easyOption:e||'Apoyar rodillas o hacer menos segundos'}),
+  remoM:      (r,d,e)=> ({name:'Remo mancuerna', reps:r, unit:'lado', ytId:'fgA4bGIKsn8', detail:d||'Apoyada en silla, tirar con codo', easyOption:e||'Bajar peso o hacer menos reps por lado'}),
+  pajaros:    (r,d,e)=> ({name:'Pájaros', reps:r, unit:'reps', ytId:'Jhzr4SYgXVM', detail:d||'Poco peso, control total', easyOption:e||'Hacerlos sin peso o con recorrido corto'}),
+  birddog:    (r,d,e)=> ({name:'Bird dog', reps:r, unit:'lado', ytId:'vzU5xrs1gMQ', detail:d||'Sin balancear la cadera', easyOption:e||'Mover solo brazo o solo pierna'}),
+  stepjack:   (r,d,e)=> ({name:'Step jack', reps:r, unit:'reps', ytId:'_wvYANRFFd4', detail:d||'Jumping jack sin salto', easyOption:e||'Menos ritmo y brazos más bajos'}),
+  remoB:      (r,d,e)=> ({name:'Remo con banda', reps:r, unit:'reps', ytId:'KmpDowjBY2A', detail:d||'Escápulas atrás al final', easyOption:e||'Usar la banda más suave o alejar menos las manos'}),
+  wallsit:    (r,d,e)=> ({name:'Wall sit', reps:r, unit:'seg', ytId:'SszDMOZvFuw', detail:d||'Espalda apoyada, rodillas 90°', isTimed:true, easyOption:e||'Subir un poco la cadera y aguantar menos segundos'}),
+  goblet:     (r,d,e)=> ({name:'Goblet squat', reps:r, unit:'reps', ytId:'pEGfGwp6IEA', detail:d||'Mancuerna ligera, bajar controlado', easyOption:e||'Hacer sentadilla a silla o bajar peso'}),
+  flexiones:  (r,d,e)=> ({name:'Flexiones inclinadas', reps:r, unit:'reps', ytId:'lJXXkkpsRBI', detail:d||'Apoyo en silla o mesa alta', easyOption:e||'Subir el apoyo o hacer menos reps'}),
+  crunch:     (r,d,e)=> ({name:'Crunch', reps:r, unit:'reps', ytId:'4hmQA3snTyk', detail:d||'Subida corta, sin tirar cuello', easyOption:e||'Recorrido más corto y manos en muslos'}),
+  planchaLat: (r,d,e)=> ({name:'Plancha lateral', reps:r, unit:'seg', ytId:'T5XO-I_BVYM', detail:d||'Cadera arriba, cuerpo en línea', isTimed:true, easyOption:e||'Apoyar rodillas o hacer menos segundos'}),
+  retraccion: (r,d,e)=> ({name:'Retracción escapular', reps:r, unit:'seg', ytId:'KOn0vhH3v5s', detail:d||'Juntar escápulas y mantener', isTimed:true, easyOption:e||'Mantener menos segundos'}),
+  hipThrust:  (r,d,e)=> ({name:'Hip thrust en silla', reps:r, unit:'reps', ytId:'wfezOuuc1p8', detail:d||'Apretar glúteo arriba 2 segundos', easyOption:e||'Volver a glute bridge en el suelo'}),
+  breathing:  (r,d,e)=> ({name:'Respiración tranquila', reps:r, unit:'seg', ytId:'', detail:d||'Respira lento por nariz', isTimed:true, easyOption:e||''}),
+  stepBack:     (r,d,e)=> ({name:'Step-back corto', reps:r, unit:'pierna', ytId:'8Ux6WtCVEPw', detail:d||'Paso atrás controlado, sin impulso', easyOption:e||'Menos recorrido o apoyo en silla'}),
+  splitSquat:   (r,d,e)=> ({name:'Split squat', reps:r, unit:'pierna', ytId:'O6qlCEZf-7U', detail:d||'Pie trasero quieto, bajar controlado', easyOption:e||'Apoyo mano en silla o menos recorrido'}),
+  wallSitPulse: (r,d,e)=> ({name:'Wall sit con pulsos', reps:r, unit:'seg', ytId:'SszDMOZvFuw', isTimed:true, detail:d||'Pequeños pulsos arriba-abajo mientras aguantas', easyOption:e||'Hacer wall sit estático si los pulsos duelen'}),
+};
+
+const cir  = (rounds, exs, restEx=30, restRound=60) => ({type:'circuit_rounds', rounds, exercises:exs, restBetweenExercises:restEx, restBetweenRounds:restRound});
+const e2m  = (min, exs) => ({type:'e2mom', duration:min, rounds:min/2, exercises:exs});
+const amr  = (min, exs, hideRounds=false) => ({type:'amrap', duration:min, exercises:exs, hideRounds});
+const fin  = (exs) => ({type:'finish', rounds:1, exercises:exs});
+const REST = next => ({duration:120, next});
+
+function withFinish(wo, finishBlock) {
+  return {...wo, finish: finishBlock};
+}
+
+const WORKOUTS = {
+  // ── BLOQUE 1 (sem 1–10) ───────────────────────────────────────────────────
+  w1: {
+    label:'Semana 1', badge:'FASE 1 · ADAPTACIÓN',
+    lunes: withFinish({ title:'Pierna + Glúteo', minutes:32, day:'LUNES', blockA: cir(4,[E.sentadilla(10),E.glute(12),E.deadbug(8)]), rest:REST("Bloque B — AMRAP 10'"), blockB: amr(10,[E.stepups(8),E.marcha(40),E.plancha(20)]) }, fin([E.planchaLat(15,'Lado derecho','Apoyar rodillas'), E.planchaLat(15,'Lado izquierdo','Apoyar rodillas'), E.breathing(30)])),
+    miercoles: withFinish({ title:'Espalda + Postura', minutes:34, day:'MIÉRCOLES', blockA: cir(4,[E.remoM(10),E.pajaros(10),E.birddog(8)]), rest:REST('Bloque B — Circuito'), blockB: cir(3,[E.stepjack(30),E.remoB(12),E.wallsit(30)],0,45) }, fin([E.retraccion(15), E.retraccion(15), E.breathing(30)])),
+    viernes: withFinish({ title:'Full Body', minutes:36, day:'VIERNES', blockA: cir(4,[E.goblet(10),E.flexiones(8),E.remoM(10)]), rest:REST("Bloque B — AMRAP 10'"), blockB: amr(10,[E.stepups(10),E.marcha(40),E.crunch(10)]) }, fin([E.planchaLat(20,'Lado derecho'), E.planchaLat(20,'Lado izquierdo'), E.breathing(30)])),
+  },
+  w2: {
+    label:'Semana 2', badge:'FASE 1 · ADAPTACIÓN',
+    lunes: withFinish({ title:'Pierna + Glúteo', minutes:34, day:'LUNES', blockA: cir(4,[E.sentadilla(12),E.glute(14),E.deadbug(10)]), rest:REST("Bloque B — AMRAP 12'"), blockB: amr(12,[E.stepups(10),E.marcha(40),E.plancha(25)]) }, fin([E.planchaLat(15,'Lado derecho'), E.planchaLat(15,'Lado izquierdo'), E.breathing(30)])),
+    miercoles: withFinish({ title:'Espalda + Postura', minutes:36, day:'MIÉRCOLES', blockA: cir(4,[E.remoM(12),E.pajaros(12),E.birddog(10)]), rest:REST('Bloque B — Circuito'), blockB: cir(3,[E.stepjack(35),E.remoB(14),E.wallsit(35)],0,45) }, fin([E.retraccion(15), E.retraccion(15), E.breathing(30)])),
+    viernes: withFinish({ title:'Full Body', minutes:36, day:'VIERNES', blockA: cir(4,[E.goblet(12),E.flexiones(10),E.remoM(12)]), rest:REST("Bloque B — AMRAP 12'"), blockB: amr(12,[E.stepups(12),E.marcha(40),E.crunch(12)]) }, fin([E.planchaLat(20,'Lado derecho'), E.planchaLat(20,'Lado izquierdo'), E.breathing(30)])),
+  },
+  w3: {
+    label:'Semana 3', badge:'FASE 1 · ADAPTACIÓN',
+    lunes: withFinish({ title:'Pierna + Glúteo', minutes:35, day:'LUNES', blockA: cir(4,[E.sentadilla(12,'Últimas 2 reps: 3s bajada lenta'),E.glute(14,'Últimas 2 reps: aguantar 3s arriba'),E.deadbug(10)]), rest:REST("Bloque B — AMRAP 12'"), blockB: amr(12,[E.stepups(10),E.marcha(40),E.plancha(25)]) }, fin([E.planchaLat(20,'Lado derecho'), E.planchaLat(20,'Lado izquierdo'), E.breathing(30)])),
+    miercoles: withFinish({ title:'Espalda + Postura', minutes:36, day:'MIÉRCOLES', blockA: cir(4,[E.remoM(12),E.pajaros(12),E.birddog(10),E.retraccion(15)]), rest:REST('Bloque B — Circuito'), blockB: cir(3,[E.stepjack(35),E.remoB(14),E.wallsit(35)],0,45) }, fin([E.retraccion(15), E.retraccion(15), E.breathing(30)])),
+    viernes: withFinish({ title:'Full Body', minutes:38, day:'VIERNES', blockA: cir(4,[E.goblet(12),E.flexiones(10),E.remoM(12)]), rest:REST('Bloque B — Circuito 3 rondas'), blockB: cir(3,[E.stepups(12),E.marcha(40),E.crunch(12),E.planchaLat(20)],0,75) }, fin([E.breathing(40)])),
+  },
+  w4: {
+    label:'Semana 4', badge:'FASE 2 · DESARROLLO',
+    lunes: withFinish({ title:'Pierna + Glúteo — E2MOM', minutes:34, day:'LUNES', blockA: e2m(12,[E.sentadilla(12),E.glute(14),E.deadbug(10)]), rest:REST('Bloque B — Circuito'), blockB: cir(3,[E.stepups(12),E.marcha(40),E.plancha(25)],0,75) }, fin([E.planchaLat(20,'Lado derecho'), E.planchaLat(20,'Lado izquierdo')])),
+    miercoles: withFinish({ title:'Espalda + Postura', minutes:36, day:'MIÉRCOLES', blockA: cir(4,[E.remoM(12),E.pajaros(12),E.birddog(10),E.retraccion(15)]), rest:REST('Bloque B — Circuito'), blockB: cir(3,[E.stepjack(35),E.remoB(14),E.wallsit(35)],0,45) }, fin([E.retraccion(15),E.breathing(30)])),
+    viernes: withFinish({ title:'Full Body', minutes:38, day:'VIERNES', blockA: cir(4,[E.goblet(12),E.flexiones(10),E.remoM(12)]), rest:REST('Bloque B — Circuito 3 rondas'), blockB: cir(3,[E.stepups(12),E.marcha(40),E.crunch(12),E.planchaLat(20)],0,75) }, fin([E.breathing(40)])),
+  },
+  w5: {
+    label:'Semana 5', badge:'FASE 2 · DESARROLLO',
+    lunes: withFinish({ title:'Pierna + Glúteo — E2MOM', minutes:34, day:'LUNES', blockA: e2m(12,[E.sentadilla(12),E.glute(15),E.deadbug(10)]), rest:REST('Bloque B — Circuito'), blockB: cir(3,[E.stepups(12),E.marcha(40),E.plancha(30)],0,75) }, fin([E.planchaLat(20,'Lado derecho'), E.planchaLat(20,'Lado izquierdo')])),
+    miercoles: withFinish({ title:'Espalda + Postura', minutes:36, day:'MIÉRCOLES', blockA: cir(4,[E.remoM(14),E.pajaros(12),E.birddog(10),E.retraccion(15)]), rest:REST('Bloque B — Circuito'), blockB: cir(3,[E.stepjack(35),E.remoB(14),E.wallsit(45)],0,45) }, fin([E.retraccion(20),E.breathing(30)])),
+    viernes: withFinish({ title:'Full Body', minutes:38, day:'VIERNES', blockA: cir(4,[E.goblet(14),E.flexiones(10),E.remoM(14)]), rest:REST('Bloque B — Circuito 3 rondas'), blockB: cir(3,[E.stepups(12),E.marcha(40),E.plancha(30),E.planchaLat(20)],0,75) }, fin([E.breathing(40)])),
+  },
+  w6: {
+    label:'Semana 6', badge:'FASE 2 · DESARROLLO',
+    lunes: withFinish({ title:'Pierna + Glúteo — E2MOM', minutes:34, day:'LUNES', blockA: e2m(12,[E.sentadilla(12,'Últimas 2 reps: 3s bajada lenta'),E.glute(15,'Últimas 2 reps: aguantar 3s arriba'),E.deadbug(10)]), rest:REST('Bloque B — Circuito'), blockB: cir(3,[E.stepups(12),E.marcha(40),E.plancha(30)],0,75) }, fin([E.planchaLat(20,'Lado derecho'), E.planchaLat(20,'Lado izquierdo')])),
+    miercoles: withFinish({ title:'Espalda + Postura', minutes:38, day:'MIÉRCOLES', blockA: cir(4,[E.remoM(14,'Pausa 2s arriba, bajar controlado'),E.pajaros(12),E.birddog(10),E.retraccion(15)]), rest:REST('Bloque B — Circuito'), blockB: cir(3,[E.stepjack(35),E.remoB(14,'Pausa 2s al final'),E.wallsit(45)],0,45) }, fin([E.retraccion(20),E.breathing(30)])),
+    viernes: withFinish({ title:'Full Body', minutes:40, day:'VIERNES', blockA: cir(4,[E.goblet(14),E.flexiones(10),E.remoM(14)]), rest:REST("Bloque B — AMRAP 14'"), blockB: amr(14,[E.stepups(12),E.marcha(40),E.crunch(12),E.planchaLat(20)]) }, fin([E.breathing(40)])),
+  },
+  w7: {
+    label:'Semana 7', badge:'FASE 2 · DESARROLLO',
+    lunes: withFinish({ title:"Pierna + Glúteo — E2MOM 14'", minutes:36, day:'LUNES', blockA: e2m(14,[E.sentadilla(12),E.glute(15),E.deadbug(10)]), rest:REST('Bloque B — Circuito'), blockB: cir(3,[E.stepups(12),E.marcha(40),E.plancha(30)],0,75) }, fin([E.planchaLat(20,'Lado derecho'), E.planchaLat(20,'Lado izquierdo')])),
+    miercoles: withFinish({ title:'Espalda + Postura', minutes:38, day:'MIÉRCOLES', blockA: cir(4,[E.remoM(14,'Pausa 2s arriba'),E.pajaros(12),E.birddog(10),E.retraccion(15)]), rest:REST('Bloque B — Circuito'), blockB: cir(3,[E.stepjack(35),E.remoB(14),E.wallsit(45)],0,45) }, fin([E.retraccion(20),E.breathing(30)])),
+    viernes: withFinish({ title:'Full Body', minutes:40, day:'VIERNES', blockA: cir(4,[E.goblet(14),E.flexiones(10),E.remoM(14)]), rest:REST("Bloque B — AMRAP 14'"), blockB: amr(14,[E.stepups(12),E.marcha(40),E.crunch(12),E.planchaLat(20)]) }, fin([E.breathing(40)])),
+  },
+  w8: {
+    label:'Semana 8', badge:'FASE 3 · CONSOLIDACIÓN',
+    lunes: withFinish({ title:'Pierna + Glúteo — E2MOM', minutes:34, day:'LUNES', blockA: e2m(12,[E.sentadilla(12),E.glute(15),E.deadbug(10)]), rest:REST('Bloque B — Circuito'), blockB: cir(3,[E.stepups(12),E.marcha(40),E.plancha(30)],0,75) }, fin([E.planchaLat(20,'Lado derecho'), E.planchaLat(20,'Lado izquierdo')])),
+    miercoles: withFinish({ title:'Espalda + Postura', minutes:38, day:'MIÉRCOLES', blockA: cir(4,[E.remoM(14),E.pajaros(12),E.birddog(10),E.retraccion(15)]), rest:REST('Bloque B — Circuito'), blockB: cir(3,[E.stepjack(35),E.remoB(14),E.wallsit(45)],0,45) }, fin([E.retraccion(20),E.breathing(30)])),
+    viernes: withFinish({ title:'Full Body', minutes:38, day:'VIERNES', blockA: cir(4,[E.goblet(14),E.flexiones(10),E.remoM(14)]), rest:REST("Bloque B — AMRAP 12'"), blockB: amr(12,[E.stepups(12),E.marcha(40),E.crunch(12),E.planchaLat(20)]) }, fin([E.breathing(40)])),
+  },
+  w9: {
+    label:'Semana 9', badge:'FASE 3 · CONSOLIDACIÓN',
+    lunes: withFinish({ title:'Pierna + Glúteo — E2MOM', minutes:34, day:'LUNES', blockA: e2m(12,[E.sentadilla(12),E.hipThrust(15),E.deadbug(10)]), rest:REST('Bloque B — Circuito'), blockB: cir(3,[E.stepups(12),E.marcha(40),E.plancha(30)],0,75) }, fin([E.planchaLat(20,'Lado derecho'), E.planchaLat(20,'Lado izquierdo')])),
+    miercoles: withFinish({ title:'Espalda + Postura', minutes:38, day:'MIÉRCOLES', blockA: cir(4,[E.remoM(14,'Pausa 2s arriba, bajar controlado'),E.pajaros(12),E.birddog(10),E.retraccion(15)]), rest:REST('Bloque B — Circuito'), blockB: cir(3,[E.stepjack(35),E.remoB(14),E.wallsit(45)],0,45) }, fin([E.retraccion(20),E.breathing(30)])),
+    viernes: withFinish({ title:'Full Body', minutes:38, day:'VIERNES', blockA: cir(4,[E.goblet(14),E.flexiones(10,'Apoyo un poco más bajo que antes'),E.remoM(14)]), rest:REST("Bloque B — AMRAP 12'"), blockB: amr(12,[E.stepups(12),E.marcha(40),E.crunch(12),E.planchaLat(20)]) }, fin([E.breathing(40)])),
+  },
+  w10: {
+    label:'Semana 10', badge:'FASE 3 · CONSOLIDACIÓN',
+    lunes: withFinish({ title:"Pierna + Glúteo — E2MOM 14'", minutes:36, day:'LUNES', blockA: e2m(14,[E.sentadilla(12),E.hipThrust(15),E.deadbug(10)]), rest:REST('Bloque B — Circuito'), blockB: cir(3,[E.stepups(12),E.marcha(40),E.plancha(30)],0,75) }, fin([E.planchaLat(20,'Lado derecho'), E.planchaLat(20,'Lado izquierdo')])),
+    miercoles: withFinish({ title:'Espalda + Postura', minutes:38, day:'MIÉRCOLES', blockA: cir(4,[E.remoM(14,'Pausa 2s arriba'),E.pajaros(12),E.birddog(10),E.retraccion(15)]), rest:REST('Bloque B — Circuito'), blockB: cir(3,[E.stepjack(35),E.remoB(14),E.wallsit(45)],0,45) }, fin([E.retraccion(20),E.breathing(30)])),
+    viernes: withFinish({ title:'Full Body — Solo moverse', minutes:40, day:'VIERNES', blockA: cir(4,[E.goblet(14),E.flexiones(10),E.remoM(14)]), rest:REST('Bloque B — ¡A moverse!'), blockB: amr(14,[E.stepups(12),E.marcha(40),E.crunch(12)],true) }, fin([E.breathing(60)])),
+  },
+
+  // ── BLOQUE 2 (sem 11–22, desde aprox. 2026-06-16) ────────────────────────
+  w11: {
+    label:'Semana 11', badge:'FASE 4 · DEFINICIÓN',
+    lunes: withFinish({ title:'Pierna + Glúteo', minutes:35, day:'LUNES', blockA: cir(4,[E.sentadilla(10,'Baja 3s lento, sube firme'),E.stepBack(10),E.glute(14,'Aprieta 2s arriba')]), rest:REST("Bloque B — AMRAP 10'"), blockB: amr(10,[E.stepups(10),E.marcha(40),E.plancha(25)]) }, fin([E.planchaLat(20,'Lado derecho'), E.planchaLat(20,'Lado izquierdo'), E.breathing(30)])),
+    miercoles: withFinish({ title:'Espalda + Postura', minutes:36, day:'MIÉRCOLES', blockA: cir(4,[E.remoM(14),E.pajaros(12),E.birddog(10),E.retraccion(15)]), rest:REST('Bloque B — Circuito'), blockB: cir(3,[E.stepjack(35),E.remoB(14),E.wallsit(40)],0,45) }, fin([E.retraccion(20), E.breathing(30)])),
+    viernes: withFinish({ title:'Full Body', minutes:37, day:'VIERNES', blockA: cir(4,[E.goblet(12,'Bajar 3s lento'),E.flexiones(10),E.remoM(14)]), rest:REST("Bloque B — AMRAP 12'"), blockB: amr(12,[E.stepups(10),E.marcha(40),E.crunch(12)]) }, fin([E.planchaLat(20,'Lado derecho'), E.planchaLat(20,'Lado izquierdo'), E.breathing(30)])),
+  },
+  w12: {
+    label:'Semana 12', badge:'FASE 4 · DEFINICIÓN',
+    lunes: withFinish({ title:'Pierna + Glúteo', minutes:36, day:'LUNES', blockA: cir(4,[E.sentadilla(12,'Baja 3s lento, sube firme'),E.stepBack(10),E.glute(15,'Aprieta 2s arriba')]), rest:REST("Bloque B — AMRAP 12'"), blockB: amr(12,[E.stepups(10),E.marcha(40),E.plancha(25)]) }, fin([E.planchaLat(20,'Lado derecho'), E.planchaLat(20,'Lado izquierdo'), E.breathing(30)])),
+    miercoles: withFinish({ title:'Espalda + Postura', minutes:36, day:'MIÉRCOLES', blockA: cir(4,[E.remoM(14),E.pajaros(12),E.birddog(10),E.retraccion(15)]), rest:REST('Bloque B — Circuito'), blockB: cir(3,[E.stepjack(35),E.remoB(14),E.wallsit(45)],0,45) }, fin([E.retraccion(20), E.breathing(30)])),
+    viernes: withFinish({ title:'Full Body', minutes:37, day:'VIERNES', blockA: cir(4,[E.goblet(12,'Bajar 3s lento'),E.flexiones(10),E.remoM(14)]), rest:REST("Bloque B — AMRAP 12'"), blockB: amr(12,[E.stepups(12),E.marcha(40),E.crunch(12)]) }, fin([E.planchaLat(20,'Lado derecho'), E.planchaLat(20,'Lado izquierdo'), E.breathing(30)])),
+  },
+  w13: {
+    label:'Semana 13', badge:'FASE 4 · DEFINICIÓN',
+    lunes: withFinish({ title:'Pierna + Glúteo', minutes:37, day:'LUNES', blockA: cir(4,[E.sentadilla(12,'Baja 3s lento'),E.splitSquat(10),E.glute(15)]), rest:REST("Bloque B — AMRAP 12'"), blockB: amr(12,[E.stepups(12),E.marcha(40),E.plancha(30)]) }, fin([E.planchaLat(20,'Lado derecho'), E.planchaLat(20,'Lado izquierdo'), E.breathing(30)])),
+    miercoles: withFinish({ title:'Espalda + Postura', minutes:38, day:'MIÉRCOLES', blockA: cir(4,[E.remoM(14),E.pajaros(12),E.birddog(10),E.retraccion(20)]), rest:REST('Bloque B — Circuito'), blockB: cir(3,[E.stepjack(35),E.remoB(14),E.wallsit(45)],0,45) }, fin([E.retraccion(20), E.breathing(30)])),
+    viernes: withFinish({ title:'Full Body', minutes:38, day:'VIERNES', blockA: cir(4,[E.goblet(14,'Bajar 3s lento'),E.flexiones(10),E.remoM(14)]), rest:REST("Bloque B — AMRAP 12'"), blockB: amr(12,[E.splitSquat(10),E.marcha(40),E.crunch(12)]) }, fin([E.planchaLat(20,'Lado derecho'), E.planchaLat(20,'Lado izquierdo'), E.breathing(30)])),
+  },
+  w14: {
+    label:'Semana 14', badge:'FASE 4 · DEFINICIÓN',
+    lunes: withFinish({ title:'Pierna + Glúteo', minutes:38, day:'LUNES', blockA: cir(4,[E.sentadilla(12,'Baja 3s lento'),E.splitSquat(10),E.glute(15),E.hipThrust(12)]), rest:REST('Bloque B — Circuito'), blockB: cir(3,[E.stepups(12),E.marcha(40),E.plancha(30)],0,60) }, fin([E.planchaLat(20,'Lado derecho'), E.planchaLat(20,'Lado izquierdo')])),
+    miercoles: withFinish({ title:'Espalda + Postura', minutes:38, day:'MIÉRCOLES', blockA: cir(4,[E.remoM(14,'Pausa 2s arriba'),E.pajaros(12),E.birddog(10),E.retraccion(20)]), rest:REST('Bloque B — Circuito'), blockB: cir(3,[E.stepjack(35),E.remoB(14),E.wallsit(45)],0,45) }, fin([E.retraccion(20), E.breathing(30)])),
+    viernes: withFinish({ title:'Full Body', minutes:40, day:'VIERNES', blockA: cir(4,[E.goblet(14,'Bajar 3s lento'),E.flexiones(10),E.remoM(14)]), rest:REST("Bloque B — AMRAP 14'"), blockB: amr(14,[E.splitSquat(10),E.marcha(40),E.crunch(12),E.planchaLat(20)]) }, fin([E.breathing(40)])),
+  },
+  w15: {
+    label:'Semana 15', badge:'FASE 5 · DENSIDAD',
+    lunes: withFinish({ title:"Pierna + Glúteo — E2MOM 12'", minutes:36, day:'LUNES', blockA: e2m(12,[E.sentadilla(12,'Baja 3s lento'),E.splitSquat(10),E.glute(15)]), rest:REST('Bloque B — Circuito'), blockB: cir(3,[E.stepups(12),E.marcha(40),E.plancha(30)],0,60) }, fin([E.planchaLat(25,'Lado derecho'), E.planchaLat(25,'Lado izquierdo')])),
+    miercoles: withFinish({ title:'Espalda + Postura', minutes:38, day:'MIÉRCOLES', blockA: cir(4,[E.remoM(14,'Pausa 2s arriba'),E.pajaros(12),E.birddog(10),E.retraccion(20)]), rest:REST('Bloque B — Circuito denso'), blockB: cir(3,[E.stepjack(40),E.remoB(14),E.wallsit(50)],0,40) }, fin([E.retraccion(20), E.breathing(30)])),
+    viernes: withFinish({ title:'Full Body', minutes:38, day:'VIERNES', blockA: cir(4,[E.goblet(14),E.flexiones(10),E.remoM(14)]), rest:REST("Bloque B — AMRAP 12'"), blockB: amr(12,[E.splitSquat(10),E.marcha(40),E.crunch(12),E.planchaLat(20)]) }, fin([E.breathing(40)])),
+  },
+  w16: {
+    label:'Semana 16', badge:'FASE 5 · DENSIDAD',
+    lunes: withFinish({ title:"Pierna + Glúteo — E2MOM 12'", minutes:36, day:'LUNES', blockA: e2m(12,[E.sentadilla(12,'Baja 3s lento'),E.splitSquat(10),E.hipThrust(15)]), rest:REST('Bloque B — Circuito'), blockB: cir(3,[E.stepups(12),E.marcha(40),E.plancha(35)],0,55) }, fin([E.planchaLat(25,'Lado derecho'), E.planchaLat(25,'Lado izquierdo')])),
+    miercoles: withFinish({ title:'Espalda + Postura', minutes:38, day:'MIÉRCOLES', blockA: cir(4,[E.remoM(14,'Pausa 2s arriba'),E.pajaros(12),E.birddog(10),E.retraccion(20)]), rest:REST('Bloque B — Circuito denso'), blockB: cir(3,[E.stepjack(40),E.remoB(14),E.wallSitPulse(50)],0,40) }, fin([E.retraccion(25), E.breathing(30)])),
+    viernes: withFinish({ title:'Full Body', minutes:38, day:'VIERNES', blockA: cir(4,[E.goblet(14,'Bajar 3s lento'),E.flexiones(12),E.remoM(14)]), rest:REST("Bloque B — AMRAP 12'"), blockB: amr(12,[E.splitSquat(10),E.marcha(40),E.crunch(14),E.planchaLat(22)]) }, fin([E.breathing(40)])),
+  },
+  w17: {
+    label:'Semana 17', badge:'FASE 5 · DENSIDAD',
+    lunes: withFinish({ title:"Pierna + Glúteo — E2MOM 14'", minutes:38, day:'LUNES', blockA: e2m(14,[E.sentadilla(12,'Baja 3s lento'),E.splitSquat(10),E.hipThrust(15)]), rest:REST('Bloque B — Circuito'), blockB: cir(3,[E.stepups(12),E.marcha(40),E.plancha(35)],0,55) }, fin([E.planchaLat(25,'Lado derecho'), E.planchaLat(25,'Lado izquierdo')])),
+    miercoles: withFinish({ title:'Espalda + Postura', minutes:40, day:'MIÉRCOLES', blockA: cir(4,[E.remoM(14,'Pausa 2s arriba'),E.pajaros(12),E.birddog(10),E.retraccion(25)]), rest:REST('Bloque B — Circuito denso'), blockB: cir(3,[E.stepjack(40),E.remoB(14),E.wallSitPulse(55)],0,40) }, fin([E.retraccion(25), E.breathing(30)])),
+    viernes: withFinish({ title:'Full Body', minutes:40, day:'VIERNES', blockA: cir(4,[E.goblet(14),E.flexiones(12),E.remoM(14)]), rest:REST("Bloque B — AMRAP 14'"), blockB: amr(14,[E.splitSquat(12),E.marcha(40),E.crunch(14),E.planchaLat(22)]) }, fin([E.breathing(40)])),
+  },
+  w18: {
+    label:'Semana 18', badge:'FASE 5 · DENSIDAD',
+    lunes: withFinish({ title:"Pierna + Glúteo — E2MOM 14'", minutes:38, day:'LUNES', blockA: e2m(14,[E.sentadilla(12,'Baja 3s lento'),E.splitSquat(12),E.hipThrust(15)]), rest:REST('Bloque B — Circuito'), blockB: cir(3,[E.stepups(14),E.marcha(40),E.plancha(35)],0,50) }, fin([E.planchaLat(30,'Lado derecho'), E.planchaLat(30,'Lado izquierdo')])),
+    miercoles: withFinish({ title:'Espalda + Postura', minutes:40, day:'MIÉRCOLES', blockA: cir(4,[E.remoM(14,'Pausa 2s arriba'),E.pajaros(12),E.birddog(10),E.retraccion(25)]), rest:REST('Bloque B — Circuito denso'), blockB: cir(3,[E.stepjack(40),E.remoB(14),E.wallSitPulse(60)],0,40) }, fin([E.retraccion(25), E.breathing(30)])),
+    viernes: withFinish({ title:'Full Body', minutes:40, day:'VIERNES', blockA: cir(4,[E.goblet(14,'Bajar 3s lento'),E.flexiones(12),E.remoM(14)]), rest:REST("Bloque B — AMRAP 14'"), blockB: amr(14,[E.splitSquat(12),E.marcha(40),E.crunch(14),E.planchaLat(25)]) }, fin([E.breathing(40)])),
+  },
+  w19: {
+    label:'Semana 19', badge:'FASE 6 · CONSOLIDACIÓN',
+    lunes: withFinish({ title:"Pierna + Glúteo — E2MOM 12'", minutes:36, day:'LUNES', blockA: e2m(12,[E.sentadilla(12),E.splitSquat(12),E.hipThrust(15)]), rest:REST('Bloque B — Circuito'), blockB: cir(3,[E.stepups(14),E.marcha(40),E.plancha(35)],0,50) }, fin([E.planchaLat(30,'Lado derecho'), E.planchaLat(30,'Lado izquierdo')])),
+    miercoles: withFinish({ title:'Espalda + Postura', minutes:38, day:'MIÉRCOLES', blockA: cir(4,[E.remoM(14,'Pausa 2s arriba'),E.pajaros(12),E.birddog(10),E.retraccion(25)]), rest:REST('Bloque B — Circuito'), blockB: cir(3,[E.stepjack(40),E.remoB(14),E.wallSitPulse(60)],0,35) }, fin([E.retraccion(25), E.breathing(30)])),
+    viernes: withFinish({ title:'Full Body', minutes:40, day:'VIERNES', blockA: cir(4,[E.goblet(14),E.flexiones(12),E.remoM(14)]), rest:REST("Bloque B — AMRAP 14'"), blockB: amr(14,[E.splitSquat(12),E.marcha(40),E.crunch(14),E.planchaLat(25)]) }, fin([E.breathing(40)])),
+  },
+  w20: {
+    label:'Semana 20', badge:'FASE 6 · CONSOLIDACIÓN',
+    lunes: withFinish({ title:"Pierna + Glúteo — E2MOM 12'", minutes:36, day:'LUNES', blockA: e2m(12,[E.sentadilla(12),E.splitSquat(12),E.hipThrust(15)]), rest:REST('Bloque B — Circuito'), blockB: cir(3,[E.stepups(14),E.marcha(40),E.plancha(40)],0,50) }, fin([E.planchaLat(30,'Lado derecho'), E.planchaLat(30,'Lado izquierdo')])),
+    miercoles: withFinish({ title:'Espalda + Postura', minutes:38, day:'MIÉRCOLES', blockA: cir(4,[E.remoM(14,'Pausa 2s arriba'),E.pajaros(12),E.birddog(10),E.retraccion(25)]), rest:REST('Bloque B — Circuito'), blockB: cir(3,[E.stepjack(40),E.remoB(14),E.wallSitPulse(60)],0,35) }, fin([E.retraccion(25), E.breathing(30)])),
+    viernes: withFinish({ title:'Full Body', minutes:40, day:'VIERNES', blockA: cir(4,[E.goblet(14),E.flexiones(12),E.remoM(14)]), rest:REST("Bloque B — AMRAP 14'"), blockB: amr(14,[E.splitSquat(14),E.marcha(40),E.crunch(14),E.planchaLat(25)]) }, fin([E.breathing(40)])),
+  },
+  w21: {
+    label:'Semana 21', badge:'FASE 6 · CONSOLIDACIÓN',
+    lunes: withFinish({ title:'Pierna + Glúteo', minutes:38, day:'LUNES', blockA: cir(4,[E.sentadilla(12),E.splitSquat(12),E.hipThrust(15),E.stepups(10)]), rest:REST('Bloque B — Circuito'), blockB: cir(3,[E.goblet(12),E.marcha(40),E.plancha(40)],0,45) }, fin([E.planchaLat(30,'Lado derecho'), E.planchaLat(30,'Lado izquierdo')])),
+    miercoles: withFinish({ title:'Espalda + Postura', minutes:38, day:'MIÉRCOLES', blockA: cir(4,[E.remoM(14,'Pausa 2s arriba'),E.pajaros(12),E.birddog(10),E.retraccion(25)]), rest:REST('Bloque B — Circuito'), blockB: cir(3,[E.stepjack(40),E.remoB(14),E.wallSitPulse(60)],0,35) }, fin([E.retraccion(25), E.breathing(30)])),
+    viernes: withFinish({ title:'Full Body', minutes:40, day:'VIERNES', blockA: cir(4,[E.goblet(14,'Bajar 3s lento'),E.flexiones(12),E.remoM(14)]), rest:REST("Bloque B — AMRAP 14'"), blockB: amr(14,[E.splitSquat(14),E.marcha(40),E.crunch(14),E.planchaLat(25)]) }, fin([E.breathing(40)])),
+  },
+  w22: {
+    label:'Semana 22', badge:'FASE 6 · CONSOLIDACIÓN',
+    lunes: withFinish({ title:'Pierna + Glúteo — Cierre suave', minutes:34, day:'LUNES', blockA: cir(4,[E.sentadilla(10,'Con calma, sin prisa'),E.splitSquat(10),E.glute(14)]), rest:REST('Bloque B — Circuito final'), blockB: cir(3,[E.stepups(10),E.marcha(40),E.plancha(30)],0,60) }, fin([E.planchaLat(25,'Lado derecho'), E.planchaLat(25,'Lado izquierdo'), E.breathing(30)])),
+    miercoles: withFinish({ title:'Espalda + Postura — Cierre suave', minutes:34, day:'MIÉRCOLES', blockA: cir(3,[E.remoM(12),E.pajaros(12),E.birddog(10),E.retraccion(20)]), rest:REST('Bloque B — Circuito final'), blockB: cir(3,[E.stepjack(35),E.remoB(12),E.wallsit(40)],0,45) }, fin([E.retraccion(20), E.breathing(40)])),
+    viernes: withFinish({ title:'Full Body — Solo fluir', minutes:36, day:'VIERNES', blockA: cir(3,[E.goblet(12),E.flexiones(10),E.remoM(12)]), rest:REST('Bloque B — ¡A moverse!'), blockB: amr(12,[E.stepups(10),E.marcha(40),E.crunch(12)],true) }, fin([E.breathing(60)])),
+  },
+};
+
+const PHASES = [
+  { label:'FASE 1 · ADAPTACIÓN',   weeks:['w1','w2','w3'] },
+  { label:'FASE 2 · DESARROLLO',   weeks:['w4','w5','w6','w7'] },
+  { label:'FASE 3 · CONSOLIDACIÓN',weeks:['w8','w9','w10'] },
+  { label:'FASE 4 · DEFINICIÓN',   weeks:['w11','w12','w13','w14'] },
+  { label:'FASE 5 · DENSIDAD',     weeks:['w15','w16','w17','w18'] },
+  { label:'FASE 6 · CONSOLIDACIÓN',weeks:['w19','w20','w21','w22'] },
+];
+const DAYS = [
+  { key:'lunes', label:'LUNES' },
+  { key:'miercoles', label:'MIÉRCOLES' },
+  { key:'viernes', label:'VIERNES' },
+];
+
+let activeWeekBtn = null;
+let currentWO = null;
+let currentBadge = '';
+
+// Bloque 1: desde 2026-04-13 (sem 1–10). Bloque 2 empieza aprox. 2026-06-16 (sem 11–22).
+const PLAN_START = new Date('2026-04-13T00:00:00');
+
+function getTodayWorkout() {
+  const today = new Date(); today.setHours(0,0,0,0);
+  const start = new Date(PLAN_START); start.setHours(0,0,0,0);
+  const diffDays = Math.floor((today - start) / 86400000);
+  if (diffDays < 0 || diffDays >= 154) return null;
+  const weekNum = Math.floor(diffDays / 7) + 1;
+  const dayKey = ({1:'lunes',3:'miercoles',5:'viernes'})[today.getDay()] || null;
+  return { weekKey: 'w' + weekNum, weekNum, dayKey };
+}
+
+function renderSelector() {
+  const td = getTodayWorkout();
+  const container = document.getElementById('sel-phases');
+  container.innerHTML = '';
+  let todayBtn = null;
+  PHASES.forEach(ph => {
+    const sec = document.createElement('div');
+    sec.className = 'sel-phase';
+    sec.innerHTML = `<div class="sel-phase-label">${ph.label}</div>`;
+    const grid = document.createElement('div');
+    grid.className = 'sel-week-grid';
+    ph.weeks.forEach(wk => {
+      const btn = document.createElement('button');
+      btn.className = 'sel-week-btn';
+      const isToday = td && td.weekKey === wk;
+      btn.innerHTML = WORKOUTS[wk].label + (isToday ? '<br><span style="font-size:9px;letter-spacing:2px;color:var(--accent)">HOY</span>' : '');
+      btn.onclick = () => selectWeek(wk, btn);
+      if (isToday) todayBtn = { wk, btn };
+      grid.appendChild(btn);
+    });
+    sec.appendChild(grid);
+    container.appendChild(sec);
+  });
+  document.getElementById('sel-day-picker').classList.remove('visible');
+  if (todayBtn) selectWeek(todayBtn.wk, todayBtn.btn);
+}
+
+function selectWeek(wk, btn) {
+  const td = getTodayWorkout();
+  if (activeWeekBtn) activeWeekBtn.classList.remove('active');
+  activeWeekBtn = btn;
+  btn.classList.add('active');
+
+  const dayBtns = document.getElementById('sel-day-btns');
+  dayBtns.innerHTML = '';
+  DAYS.forEach(d => {
+    const wo = WORKOUTS[wk][d.key];
+    const isToday = td && td.weekKey === wk && td.dayKey === d.key;
+    const b = document.createElement('button');
+    b.className = 'sel-day-btn' + (isToday ? ' active' : '');
+    b.innerHTML = `${d.label}${isToday ? ' <span style="font-size:9px;color:var(--accent);letter-spacing:1px">HOY</span>' : ''}<div class="sel-day-title">${wo.title} · ${wo.minutes} min</div>`;
+    b.onclick = () => selectDay(wk, d.key);
+    dayBtns.appendChild(b);
+  });
+
+  const picker = document.getElementById('sel-day-picker');
+  picker.classList.add('visible');
+  picker.scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+function selectDay(wk, dayKey) {
+  currentWO = WORKOUTS[wk][dayKey];
+  currentBadge = WORKOUTS[wk].badge;
+  showStartScreen();
+}
+
+let ytPlayer = null;
+let currentVideoId = null;
+function onYouTubeIframeAPIReady() {
+  ytPlayer = new YT.Player('yt-player', {
+    height:'100%', width:'100%', videoId:'xqvCmoLULNY',
+    playerVars:{ autoplay:0, controls:0, mute:1, rel:0, modestbranding:1 },
+    events:{ onStateChange: e => { if (e.data === YT.PlayerState.ENDED) ytPlayer.playVideo(); } }
+  });
+}
+function loadVideo(ytId) {
+  const help = document.getElementById('video-help');
+  if (help && ytId) {
+    help.href = `https://www.youtube.com/watch?v=${ytId}`;
+  }
+  if (!ytPlayer) return;
+  if (!ytId) return;
+  if (ytId !== currentVideoId) {
+    currentVideoId = ytId;
+    ytPlayer.loadVideoById({ videoId: ytId, startSeconds: 0 });
+    ytPlayer.playVideo();
+  }
+}
+
+let activePhase = 'A';
+let exIdx = 0;
+let roundIdx = 0;
+let elapsed = 0;
+let paused = false;
+let amrapRounds = 0;
+let mainInterval = null;
+let localTimerInterval = null;
+let restInterval = null;
+let restCallback = null;
+let workoutStartTime = null;
+
+function getActiveBlock() {
+  if (activePhase === 'A') return currentWO.blockA;
+  if (activePhase === 'B') return currentWO.blockB;
+  return currentWO.finish;
+}
+function clearAllTimers() {
+  clearInterval(mainInterval);
+  clearInterval(localTimerInterval);
+  clearInterval(restInterval);
+  mainInterval = localTimerInterval = restInterval = null;
+}
+function fmt(s) {
+  s = Math.max(0, Math.round(s));
+  return `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;
+}
+
+function showStartScreen() {
+  document.getElementById('selector-screen').classList.remove('visible');
+  document.getElementById('player').style.display = 'none';
+  const wo = currentWO;
+
+  document.getElementById('start-day-label').textContent = wo.day;
+  document.getElementById('start-subtitle').textContent = `${wo.title} · ${wo.minutes} min`;
+
+  const list = document.getElementById('start-list');
+  list.innerHTML = '';
+  const bA = wo.blockA;
+  list.innerHTML += `<li class="hdr">${bA.type === 'e2mom' ? `Bloque A · E2MOM ${bA.duration}'` : `Bloque A · Circuito · ${bA.rounds} rondas`}</li>`;
+  bA.exercises.forEach(ex => list.innerHTML += `<li>${ex.reps} ${ex.unit} — ${ex.name}</li>`);
+  list.innerHTML += `<li class="hdr">⸻ descanso 2' ⸻</li>`;
+  const bB = wo.blockB;
+  list.innerHTML += `<li class="hdr">${bB.type === 'amrap' ? `Bloque B · AMRAP ${bB.duration}'` : `Bloque B · Circuito · ${bB.rounds} rondas`}</li>`;
+  bB.exercises.forEach(ex => list.innerHTML += `<li>${ex.reps} ${ex.unit} — ${ex.name}</li>`);
+  if (wo.finish && wo.finish.exercises?.length) {
+    list.innerHTML += `<li class="hdr">Bloque C · Cierre suave</li>`;
+    wo.finish.exercises.forEach(ex => list.innerHTML += `<li>${ex.reps} ${ex.unit} — ${ex.name}</li>`);
+  }
+  document.getElementById('start-screen').classList.add('visible');
+}
+
+function beginWorkout() {
+  document.getElementById('start-screen').classList.remove('visible');
+  document.getElementById('player').style.display = 'flex';
+  document.getElementById('phase-badge').textContent = currentBadge;
+  activePhase = 'A'; exIdx = roundIdx = elapsed = amrapRounds = 0; paused = false; currentVideoId = null;
+  workoutStartTime = Date.now();
+  document.getElementById('play-btn').textContent = 'PAUSA';
+  startBlock('A');
+}
+
+function getBlockLabel(block, ph) {
+  const p = ph === 'A' ? 'A' : ph === 'B' ? 'B' : 'C';
+  if (block.type === 'e2mom') return `BLOQUE ${p} · E2MOM ${block.duration}'`;
+  if (block.type === 'amrap') return `BLOQUE ${p} · AMRAP ${block.duration}'`;
+  if (block.type === 'finish') return `BLOQUE ${p} · CIERRE`;
+  return `BLOQUE ${p} · ${block.rounds} RONDAS`;
+}
+
+function startBlock(ph) {
+  activePhase = ph;
+  exIdx = 0; roundIdx = 0;
+  const block = getActiveBlock();
+  document.getElementById('block-name').textContent = getBlockLabel(block, ph);
+  buildList(block.exercises);
+
+  if (block.type === 'circuit_rounds') {
+    document.getElementById('rounds-section').style.display = '';
+    buildDots(block.rounds);
+    updateDots(0, block.rounds);
+    updateRoundsLabel(`Ronda 1 de ${block.rounds}`);
+    hideTimerDisplay();
+    renderCurrentEx();
+  } else if (block.type === 'e2mom') {
+    document.getElementById('rounds-section').style.display = '';
+    buildDots(block.rounds);
+    updateDots(0, block.rounds);
+    updateRoundsLabel(`Ronda 1 de ${block.rounds}`);
+    showTimerDisplay('2:00');
+    renderCurrentEx();
+    startE2MOMTimer();
+  } else if (block.type === 'amrap') {
+    amrapRounds = 0;
+    if (block.hideRounds) {
+      document.getElementById('rounds-section').style.display = 'none';
+    } else {
+      document.getElementById('rounds-section').style.display = '';
+      buildDots(0);
+      updateRoundsLabel('Rondas completas: 0');
+    }
+    renderCurrentEx();
+    startAMRAPTimer();
+  } else if (block.type === 'finish') {
+    document.getElementById('rounds-section').style.display = 'none';
+    hideTimerDisplay();
+    renderCurrentEx();
+  }
+}
+
+function startE2MOMTimer() {
+  const block = currentWO.blockA;
+  const roundDur = 120;
+  const totalSec = block.duration * 60;
+  elapsed = 0;
+  mainInterval = setInterval(() => {
+    if (paused) return;
+    elapsed++;
+    if (elapsed >= totalSec) {
+      clearInterval(mainInterval); mainInterval = null;
+      showRestScreen(currentWO.rest.duration, 'DESCANSO', currentWO.rest.next, () => startBlock('B'));
+      return;
+    }
+    const roundElapsed = elapsed % roundDur;
+    const remaining = roundDur - roundElapsed;
+    showTimerDisplay(fmt(remaining), remaining <= 10);
+    const newRound = Math.floor(elapsed / roundDur);
+    if (newRound !== roundIdx && newRound < block.rounds) {
+      roundIdx = newRound; exIdx = 0;
+      updateDots(roundIdx, block.rounds);
+      updateRoundsLabel(`Ronda ${roundIdx + 1} de ${block.rounds}`);
+      renderCurrentEx();
+    }
+  }, 1000);
+}
+
+function startAMRAPTimer() {
+  const block = getActiveBlock();
+  const totalSec = block.duration * 60;
+  elapsed = 0;
+  mainInterval = setInterval(() => {
+    if (paused) return;
+    elapsed++;
+    const remaining = totalSec - elapsed;
+    showTimerDisplay(fmt(remaining), remaining <= 30);
+    if (elapsed >= totalSec) {
+      clearInterval(mainInterval); mainInterval = null;
+      if (currentWO.finish) startBlock('C'); else finishWorkout();
+    }
+  }, 1000);
+}
+
+function startLocalTimer(seconds, onDone) {
+  clearInterval(localTimerInterval);
+  let remaining = seconds;
+  showTimerDisplay(fmt(remaining));
+  localTimerInterval = setInterval(() => {
+    if (paused) return;
+    remaining--;
+    showTimerDisplay(fmt(remaining), remaining <= 5);
+    if (remaining <= 0) {
+      clearInterval(localTimerInterval); localTimerInterval = null;
+      hideTimerDisplay();
+      onDone();
+    }
+  }, 1000);
+}
+
+function showRestScreen(duration, label, nextMsg, callback) {
+  clearInterval(localTimerInterval); localTimerInterval = null;
+  if (ytPlayer) ytPlayer.stopVideo();
+  restCallback = callback;
+  let remaining = duration;
+  document.getElementById('rest-label').textContent = label;
+  document.getElementById('rest-next-msg').textContent = nextMsg;
+  document.getElementById('rest-countdown').textContent = fmt(remaining);
+  document.getElementById('rest-screen').classList.add('visible');
+  restInterval = setInterval(() => {
+    if (paused) return;
+    remaining--;
+    document.getElementById('rest-countdown').textContent = fmt(remaining);
+    if (remaining <= 0) { clearInterval(restInterval); restInterval = null; finishRest(); }
+  }, 1000);
+}
+function finishRest() {
+  document.getElementById('rest-screen').classList.remove('visible');
+  if (restCallback) { const cb = restCallback; restCallback = null; cb(); }
+}
+function skipRest() {
+  clearInterval(restInterval); restInterval = null; finishRest();
+}
+
+function nextEx() {
+  const block = getActiveBlock();
+  if (block.type === 'circuit_rounds') {
+    nextInCircuit();
+    return;
+  }
+  if (block.type === 'finish') {
+    nextInFinish();
+    return;
+  }
+  clearInterval(localTimerInterval); localTimerInterval = null;
+  exIdx = (exIdx + 1) % block.exercises.length;
+  if (block.type === 'amrap' && exIdx === 0) {
+    amrapRounds++;
+    if (!block.hideRounds) {
+      updateRoundsLabel(`Rondas completas: ${amrapRounds}`);
+      addAmrapDot();
+    }
+  }
+  renderCurrentEx();
+}
+
+function prevEx() {
+  clearInterval(localTimerInterval); localTimerInterval = null;
+  const block = getActiveBlock();
+  exIdx = (exIdx - 1 + block.exercises.length) % block.exercises.length;
+  renderCurrentEx();
+}
+
+function nextInCircuit() {
+  clearInterval(localTimerInterval); localTimerInterval = null;
+  hideTimerDisplay();
+  const block = getActiveBlock();
+  const isLastEx = exIdx === block.exercises.length - 1;
+  const isLastRound = roundIdx === block.rounds - 1;
+  if (isLastEx && isLastRound) {
+    if (activePhase === 'A') {
+      showRestScreen(currentWO.rest.duration, 'DESCANSO', currentWO.rest.next, () => startBlock('B'));
+    } else {
+      if (currentWO.finish) startBlock('C'); else finishWorkout();
+    }
+    return;
+  }
+  if (isLastEx) {
+    const dur = block.restBetweenRounds || 60;
+    const nextRound = roundIdx + 2;
+    showRestScreen(dur, 'DESCANSO ENTRE RONDAS', `Ronda ${nextRound} de ${block.rounds}`, () => {
+      roundIdx++; exIdx = 0;
+      updateDots(roundIdx, block.rounds);
+      updateRoundsLabel(`Ronda ${roundIdx + 1} de ${block.rounds}`);
+      renderCurrentEx();
+    });
+    return;
+  }
+  const restDur = block.restBetweenExercises || 0;
+  if (restDur > 0) {
+    const next = block.exercises[exIdx + 1];
+    showRestScreen(restDur, 'DESCANSO', `Siguiente: ${next.name}`, () => { exIdx++; renderCurrentEx(); });
+  } else {
+    exIdx++; renderCurrentEx();
+  }
+}
+
+function nextInFinish() {
+  clearInterval(localTimerInterval); localTimerInterval = null;
+  const block = getActiveBlock();
+  const isLastEx = exIdx === block.exercises.length - 1;
+  if (isLastEx) {
+    finishWorkout();
+    return;
+  }
+  exIdx++;
+  renderCurrentEx();
+}
+
+function renderCurrentEx() {
+  const block = getActiveBlock();
+  const ex = block.exercises[exIdx];
+  if (!ex) return;
+  document.getElementById('ex-name').textContent = ex.name;
+  document.getElementById('rep-count').textContent = ex.reps;
+  document.getElementById('rep-label').textContent = ex.unit.toUpperCase();
+  document.getElementById('ex-detail').textContent = ex.detail || '';
+  const easy = document.getElementById('easy-option');
+  if (ex.easyOption) {
+    easy.textContent = `Más fácil: ${ex.easyOption}`;
+    easy.classList.add('visible');
+  } else {
+    easy.textContent = '';
+    easy.classList.remove('visible');
+  }
+  loadVideo(ex.ytId);
+  updateListHighlight();
+  if (ex.isTimed && (block.type === 'circuit_rounds' || block.type === 'finish')) {
+    startLocalTimer(ex.reps, () => nextEx());
+  }
+}
+
+function buildList(exercises) {
+  const list = document.getElementById('ex-list');
+  list.innerHTML = '';
+  exercises.forEach((ex, i) => {
+    const item = document.createElement('div');
+    item.className = 'ex-item';
+    item.id = `ex-item-${i}`;
+    item.innerHTML = `<div class="ex-num">${String(i+1).padStart(2,'0')}</div><div class="ex-info"><div class="ex-name-s">${ex.name}</div><div class="ex-reps">${ex.reps} ${ex.unit}</div></div>`;
+    item.onclick = () => { exIdx = i; renderCurrentEx(); };
+    list.appendChild(item);
+  });
+}
+function updateListHighlight() {
+  document.querySelectorAll('.ex-item').forEach((el, i) => {
+    el.classList.remove('active');
+    if (i === exIdx) {
+      el.classList.add('active');
+      el.scrollIntoView({ block:'nearest', behavior:'smooth' });
+    }
+  });
+}
+function buildDots(n) {
+  const c = document.getElementById('rounds-dots');
+  c.innerHTML = '';
+  for (let i = 0; i < n; i++) {
+    const d = document.createElement('div');
+    d.className = 'dot'; d.id = `dot-${i}`; c.appendChild(d);
+  }
+}
+function updateDots(current, total) {
+  for (let i = 0; i < total; i++) {
+    const d = document.getElementById(`dot-${i}`);
+    if (!d) continue;
+    d.className = 'dot' + (i < current ? ' done' : i === current ? ' current' : '');
+  }
+}
+function addAmrapDot() {
+  const d = document.createElement('div'); d.className = 'dot done';
+  document.getElementById('rounds-dots').appendChild(d);
+}
+function updateRoundsLabel(text) {
+  document.getElementById('rounds-label').textContent = text;
+}
+function showTimerDisplay(text, warn=false) {
+  const el = document.getElementById('timer-display');
+  el.style.display = 'block'; el.textContent = text; el.className = 'timer-overlay' + (warn ? ' warning' : '');
+}
+function hideTimerDisplay() {
+  document.getElementById('timer-display').style.display = 'none';
+}
+function togglePause() {
+  paused = !paused;
+  document.getElementById('play-btn').textContent = paused ? 'REANUDAR' : 'PAUSA';
+  if (paused) { if (ytPlayer) ytPlayer.pauseVideo(); }
+  else { if (ytPlayer && currentVideoId) ytPlayer.playVideo(); }
+}
+function finishWorkout() {
+  clearAllTimers();
+  if (ytPlayer) ytPlayer.stopVideo();
+  document.getElementById('player').style.display = 'none';
+  const totalMin = Math.round((Date.now() - workoutStartTime) / 60000);
+  let stats = `Tiempo total: ${totalMin} min`;
+  if (amrapRounds > 0) stats += ` · Rondas AMRAP: ${amrapRounds}`;
+  document.getElementById('finish-stats').textContent = stats;
+  document.getElementById('finish-screen').classList.add('visible');
+}
+function goToSelector() {
+  clearAllTimers();
+  if (ytPlayer) ytPlayer.stopVideo();
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('visible'));
+  document.getElementById('player').style.display = 'none';
+  document.getElementById('selector-screen').classList.add('visible');
+}
+
+renderSelector();
+const ytTag = document.createElement('script');
+ytTag.src = 'https://www.youtube.com/iframe_api';
+document.head.appendChild(ytTag);
+</script>
+</body>
+</html>
